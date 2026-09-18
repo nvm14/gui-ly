@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ly ơi, đi xem phim với anh hônggg ❤️</title>
+  <!-- Google Fonts & Tailwind CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* Ambient floating petals and hearts */
+    .bg-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: floatParticle 8s linear infinite;
+    }
+
+    @keyframes floatParticle {
+      0% {
+        transform: translateY(105vh) scale(0.6) rotate(0deg);
+        opacity: 0.15;
+      }
+      50% {
+        opacity: 0.65;
+      }
+      100% {
+        transform: translateY(-12vh) scale(1.15) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Bunny idle gentle sway */
+    .bunny-idle {
+      animation: bunnyGentle 3s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+    }
+
+    @keyframes bunnyGentle {
+      0% { transform: translateY(0) rotate(-1.5deg); }
+      100% { transform: translateY(-6px) rotate(1.5deg); }
+    }
+
+    /* Flower waving in hand */
+    .flower-sway {
+      animation: flowerWave 2s ease-in-out infinite alternate;
+      transform-origin: 75px 175px;
+    }
+
+    @keyframes flowerWave {
+      0% { transform: rotate(-5deg); }
+      100% { transform: rotate(10deg); }
+    }
+
+    /* Bunny Happy Dancing */
+    .bunny-happy {
+      animation: bunnyJump 0.5s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+    }
+
+    @keyframes bunnyJump {
+      0% { transform: translateY(0) scale(1.02) rotate(-5deg); }
+      100% { transform: translateY(-22px) scale(1.1) rotate(5deg); }
+    }
+
+    /* Heart pulse effect for the Center Yes Button */
+    .heart-pulse {
+      animation: heartbeatPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes heartbeatPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.45); }
+      50% { box-shadow: 0 0 25px 8px rgba(225, 29, 72, 0.55); }
+    }
+
+    /* Smooth runaway positioning transition for "Không" button */
+    #btnNo {
+      transition: left 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-[#fff5f5] via-[#ffe8ec] to-[#fed7e2] text-gray-800 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+
+  <!-- Ambient floating hearts & flower petals -->
+  <div id="ambientContainer" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+  <!-- Main Card Container -->
+  <main class="relative z-10 w-full max-w-lg mx-auto flex flex-col items-center text-center px-4">
+    
+    <!-- Bunny Graphic Container -->
+    <div id="bunnyContainer" class="relative w-56 h-56 sm:w-64 sm:h-64 mb-2 flex items-center justify-center">
+      
+      <!-- Sparkle hearts over bunny -->
+      <div id="headHearts" class="absolute top-0 flex gap-2 animate-bounce">
+        <span class="text-rose-400 text-2xl">✨</span>
+        <span class="text-pink-500 text-3xl">🌸</span>
+        <span class="text-rose-400 text-2xl">✨</span>
+      </div>
+
+      <!-- SVG Drawing matching the cute white bunny holding flower -->
+      <div id="bunnySvgWrapper" class="bunny-idle w-full h-full flex items-center justify-center">
+        <svg viewBox="0 0 300 320" class="w-full h-full filter drop-shadow-lg">
+          <defs>
+            <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.12" />
+            </filter>
+          </defs>
+
+          <!-- Flower Group (Stem, leaves, blossom) -->
+          <g id="flowerGroup" class="flower-sway">
+            <!-- Flower Stem -->
+            <path d="M 85 185 Q 70 145 60 115" stroke="#382823" stroke-width="7" stroke-linecap="round" fill="none" />
+            <!-- Stem under-paw extension -->
+            <path d="M 86 185 L 94 220" stroke="#382823" stroke-width="6.5" stroke-linecap="round" fill="none" />
+
+            <!-- Green Leaf 1 (Left) -->
+            <path d="M 64 135 C 38 135, 30 155, 34 162 C 45 166, 68 152, 65 137 Z" 
+                  fill="#4ade80" stroke="#382823" stroke-width="5.5" stroke-linejoin="round" />
+            <!-- Green Leaf 2 (Right) -->
+            <path d="M 72 144 C 88 135, 96 148, 92 160 C 82 165, 70 156, 72 144 Z" 
+                  fill="#4ade80" stroke="#382823" stroke-width="5.5" stroke-linejoin="round" />
+
+            <!-- Pink 4-Petal Blossom with dark contour like the photo -->
+            <g transform="translate(56, 110)">
+              <!-- Top petal -->
+              <circle cx="0" cy="-22" r="17" fill="#ff7e8e" stroke="#382823" stroke-width="6.5"/>
+              <!-- Bottom petal -->
+              <circle cx="0" cy="22" r="17" fill="#ff7e8e" stroke="#382823" stroke-width="6.5"/>
+              <!-- Left petal -->
+              <circle cx="-22" cy="0" r="17" fill="#ff7e8e" stroke="#382823" stroke-width="6.5"/>
+              <!-- Right petal -->
+              <circle cx="22" cy="0" r="17" fill="#ff7e8e" stroke="#382823" stroke-width="6.5"/>
+              <!-- Flower Center Core -->
+              <circle cx="0" cy="0" r="19" fill="#ff7e8e" stroke="#382823" stroke-width="6.5"/>
+              <!-- Yellow pistil -->
+              <circle cx="-2" cy="-3" r="7" fill="#fed049" stroke="#382823" stroke-width="4"/>
+              <circle cx="4" cy="2" r="5" fill="#fed049" stroke="#382823" stroke-width="3"/>
+            </g>
+          </g>
+
+          <!-- Bunny Body / Head / Ears -->
+          <g id="bunnyBody">
+            <!-- Left Ear -->
+            <path d="M 125 105 
+                     C 118 70, 115 28, 138 18 
+                     C 155 12, 168 35, 162 90 Z" 
+                  fill="#ffffff" stroke="#382823" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+
+            <!-- Right Ear -->
+            <path d="M 172 90 
+                     C 178 35, 192 12, 210 18 
+                     C 230 28, 226 70, 216 108 Z" 
+                  fill="#ffffff" stroke="#382823" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+
+            <!-- Bunny Torso / Right Arm / Bottom -->
+            <!-- Right waving hand / arm -->
+            <path d="M 235 240 Q 260 255 272 265 C 275 272, 260 282, 248 276 Q 225 264, 210 260" 
+                  fill="#ffffff" stroke="#382823" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+
+            <!-- Bottom torso -->
+            <path d="M 115 285 L 115 295 C 115 298, 240 298, 240 295 L 240 285 Z" 
+                  fill="#ffffff" stroke="#382823" stroke-width="7" stroke-linejoin="round"/>
+
+            <!-- Head & Big Chubby Face contour -->
+            <path d="M 120 105 
+                     C 80 118, 55 162, 65 208 
+                     C 76 250, 115 278, 175 278 
+                     C 235 278, 276 248, 282 198 
+                     C 288 152, 260 115, 218 102 
+                     C 190 94, 142 94, 120 105 Z" 
+                  fill="#ffffff" stroke="#382823" stroke-width="7" stroke-linejoin="round"/>
+
+            <!-- Cheerful Pink Rosy Cheeks -->
+            <ellipse cx="102" cy="195" rx="19" ry="12" fill="#ff9cb0" />
+            <ellipse cx="236" cy="197" rx="19" ry="12" fill="#ff9cb0" />
+
+            <!-- Eyes (Round dark expressive eyes) -->
+            <g id="bunnyEyes">
+              <!-- Left eye -->
+              <circle cx="132" cy="172" r="7" fill="#382823" />
+              <!-- Right eye -->
+              <circle cx="204" cy="172" r="7" fill="#382823" />
+            </g>
+
+            <!-- Mouth (Big open happy mouth as in photo :D) -->
+            <g id="bunnyMouth">
+              <path d="M 154 180 Q 169 174 184 180 C 184 206, 154 206, 154 180 Z" 
+                    fill="#ffffff" stroke="#382823" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+            </g>
+
+            <!-- Left Arm Holding the Flower Stem -->
+            <!-- Hand / paw clenching flower -->
+            <path d="M 75 220 
+                     C 62 190, 68 165, 85 165 
+                     C 98 165, 105 185, 96 215 
+                     C 90 230, 80 232, 75 220 Z" 
+                  fill="#ffffff" stroke="#382823" stroke-width="6.5" stroke-linejoin="round"/>
+
+            <!-- Chest curve connecting arm to chest -->
+            <path d="M 88 215 C 95 242, 115 260, 138 266" 
+                  stroke="#382823" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Question Title -->
+    <div class="mb-6">
+      <h1 id="questionText" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#3a2c30] tracking-tight leading-snug drop-shadow-sm transition-all duration-300">
+        Ly ơi, em có muốn đi xem phim với anh hônggg
+      </h1>
+      <p id="subHint" class="text-sm sm:text-base font-bold text-pink-600/80 mt-2 transition-all duration-300">
+        (Em chỉ được chọn 1 trong 2 thui nhen! 🎬🍿)
+      </p>
+    </div>
+
+    <!-- Interactive Buttons Area -->
+    <div id="buttonArea" class="relative w-full max-w-sm h-32 flex items-center justify-center">
+      
+      <!-- Button Container when side-by-side initially -->
+      <div id="initialBtnGroup" class="flex items-center justify-center gap-6 w-full">
+        <!-- Button CÓ -->
+        <button 
+          id="btnYes"
+          class="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xl px-10 py-3 rounded-2xl shadow-lg hover:shadow-rose-400/50 active:scale-95 transition-all duration-200 cursor-pointer select-none">
+          Có ❤️
+        </button>
+
+        <!-- Button KHÔNG -->
+        <button 
+          id="btnNo"
+          class="bg-[#4a6b82] hover:bg-[#3d5a70] text-white font-bold text-xl px-8 py-3 rounded-2xl shadow-md cursor-pointer select-none whitespace-nowrap">
+          Không
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Success Celebration Card (Hidden initially) -->
+    <div id="successCard" class="hidden opacity-0 transform translate-y-6 transition-all duration-500 bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-2xl border-2 border-pink-200 max-w-md w-full mt-4">
+      <div class="inline-flex p-3.5 bg-rose-100 rounded-full text-rose-500 mb-3 animate-bounce">
+        <svg class="w-9 h-9" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-rose-600 mb-2">
+        Yeeeee! Chốt kèo nha Ly ơi! 🎉
+      </h2>
+      <p class="text-base sm:text-lg text-gray-700 font-bold mb-4">
+        Anh chờ em đó 💕
+      </p>
+
+      <div class="bg-gradient-to-r from-rose-50 to-pink-50 rounded-2xl p-4 text-sm text-pink-700 border border-pink-200 font-semibold leading-relaxed mb-5 shadow-inner">
+        Em chỉ việc xinh đẹp thui, vé xem phim với bắp nước thơm lừng để anh lo hết nhá! 🥤✨
+      </div>
+
+      <!-- Quick messaging button for sweet confirmation -->
+      <a 
+        id="btnMsg" 
+        href="https://m.me/" 
+        target="_blank" 
+        class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:shadow-rose-400/50 transition">
+        <span>Nhắn tin cho anh ngay</span> 💬
+      </a>
+
+      <div>
+        <button 
+          id="btnReplay" 
+          class="mt-4 text-xs text-gray-400 hover:text-pink-600 font-semibold underline transition">
+          Thử bấm lại từ đầu nha
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    // --- DOM Elements ---
+    const btnYes = document.getElementById('btnYes');
+    const btnNo = document.getElementById('btnNo');
+    const buttonArea = document.getElementById('buttonArea');
+    const initialBtnGroup = document.getElementById('initialBtnGroup');
+    const questionText = document.getElementById('questionText');
+    const subHint = document.getElementById('subHint');
+    const successCard = document.getElementById('successCard');
+    const bunnySvgWrapper = document.getElementById('bunnySvgWrapper');
+    const bunnyEyes = document.getElementById('bunnyEyes');
+    const bunnyMouth = document.getElementById('bunnyMouth');
+    const headHearts = document.getElementById('headHearts');
+    const btnReplay = document.getElementById('btnReplay');
+
+    // 10 dynamic funny texts for the runaway button
+    const teasingTexts = [
+      "Hông bé ơi 😜",
+      "Kó cái giề mà Kó :3",
+      "Ai cho mà bấm hả?",
+      "Cấm từ chối nhaaa 🥺",
+      "Nút này bị hỏng rùi!",
+      "Mơ đii, hổng cho bấm đâu 😝",
+      "Chạy đâu cho thoát nà",
+      "Bấm CÓ lẹ lên điii ❤️",
+      "Chỉ được chọn CÓ thui!",
+      "Năn nỉ bấm Có mừ 🥰"
+    ];
+
+    let dodgeCount = 0;
+    let yesScale = 1;
+    let isSeparated = false;
+
+    // --- Floating Background Elements ---
+    function initFloatingBackground() {
+      const container = document.getElementById('ambientContainer');
+      const icons = ['🌸', '✨', '💖', '🍿', '🌹', '❤️'];
+      const total = 18;
+
+      for (let i = 0; i < total; i++) {
+        const span = document.createElement('div');
+        span.className = 'bg-particle text-xl sm:text-2xl select-none';
+        span.textContent = icons[Math.floor(Math.random() * icons.length)];
+        span.style.left = `${Math.random() * 95}vw`;
+        span.style.animationDuration = `${6 + Math.random() * 6}s`;
+        span.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(span);
+      }
+    }
+    initFloatingBackground();
+
+    // --- Sound Effects with Web Audio API (Clean tone generator) ---
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioContext = null;
+
+    function playTone(freq, type = 'sine', duration = 0.12) {
+      try {
+        if (!audioContext) audioContext = new AudioContextClass();
+        if (audioContext.state === 'suspended') audioContext.resume();
+
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playDodgeSfx() {
+      playTone(400 + Math.random() * 150, 'sine', 0.1);
+    }
+
+    function playFanfare() {
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      notes.forEach((f, i) => {
+        setTimeout(() => playTone(f, 'triangle', 0.28), i * 110);
+      });
+    }
+
+    // --- The Core Mechanic: Dodge "Không" & Center "Có" ---
+    function handleDodge(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      dodgeCount++;
+      playDodgeSfx();
+
+      // STEP 1: If first time touched, detach and place "Có" right at Center Stage
+      if (!isSeparated) {
+        isSeparated = true;
+
+        // Make button area pure center anchor
+        initialBtnGroup.classList.remove('justify-center', 'gap-6');
+        initialBtnGroup.classList.add('relative', 'w-full', 'h-full');
+
+        // Center the "Có" button right inside the buttonArea
+        btnYes.style.position = 'absolute';
+        btnYes.style.left = '50%';
+        btnYes.style.top = '50%';
+        btnYes.style.transform = 'translate(-50%, -50%) scale(1.1)';
+        btnYes.style.zIndex = '30';
+        btnYes.classList.add('heart-pulse');
+
+        // Turn "Không" button into free-floating fixed viewport element
+        btnNo.style.position = 'fixed';
+        btnNo.style.zIndex = '40';
+      }
+
+      // STEP 2: Enlarge the centered "Có" button progressively
+      yesScale += 0.12;
+      btnYes.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
+
+      // STEP 3: Change text of "Không" to tease
+      const textIdx = dodgeCount % teasingTexts.length;
+      btnNo.textContent = teasingTexts[textIdx];
+
+      // STEP 4: Relocate "Không" to a random location on screen away from center
+      const btnW = btnNo.offsetWidth || 110;
+      const btnH = btnNo.offsetHeight || 50;
+      const padding = 16;
+
+      const screenW = window.innerWidth;
+      const screenH = window.innerHeight;
+
+      let newX = Math.floor(Math.random() * (screenW - btnW - padding * 2)) + padding;
+      let newY = Math.floor(Math.random() * (screenH - btnH - padding * 2)) + padding;
+
+      // Ensure it doesn't overlap the centered "Có" button
+      const yesBox = btnYes.getBoundingClientRect();
+      if (
+        newX < yesBox.right + 30 &&
+        newX + btnW > yesBox.left - 30 &&
+        newY < yesBox.bottom + 30 &&
+        newY + btnH > yesBox.top - 30
+      ) {
+        newY = (newY > screenH / 2) ? padding + 20 : screenH - btnH - padding - 20;
+      }
+
+      btnNo.style.left = `${newX}px`;
+      btnNo.style.top = `${newY}px`;
+
+      // Update playful hint
+      subHint.textContent = "Hihi nút CÓ ở giữa to đùng kìa, bấm đi màaa~ 💖";
+      subHint.classList.remove('text-pink-600/80');
+      subHint.classList.add('text-rose-600', 'animate-pulse');
+    }
+
+    // Attach interaction events: mouse hover, touch tap, mouse click
+    btnNo.addEventListener('mouseenter', handleDodge);
+    btnNo.addEventListener('pointerenter', handleDodge);
+    btnNo.addEventListener('touchstart', handleDodge, { passive: false });
+    btnNo.addEventListener('click', handleDodge);
+
+    // --- Success Event when "Có" is Clicked ---
+    function triggerCelebration() {
+      // 1. Center heart firework
+      confetti({
+        particleCount: 100,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#ff4d6d', '#ff758f', '#ff8fa3', '#ffb3c1', '#ffe5ec']
+      });
+
+      // 2. Dual cannon side celebration
+      const end = Date.now() + 2500;
+      const interval = setInterval(() => {
+        if (Date.now() > end) {
+          clearInterval(interval);
+          return;
+        }
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0, y: 0.65 },
+          colors: ['#ff4d6d', '#ffccd5', '#ffffff']
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 60,
+          origin: { x: 1, y: 0.65 },
+          colors: ['#ff4d6d', '#ffccd5', '#ffffff']
+        });
+      }, 50);
+    }
+
+    function onAccepted() {
+      playFanfare();
+      triggerCelebration();
+
+      // Switch bunny to happy dancing mode
+      bunnySvgWrapper.classList.remove('bunny-idle');
+      bunnySvgWrapper.classList.add('bunny-happy');
+
+      // Change eyes to happy smiling eyes (^^)
+      bunnyEyes.innerHTML = `
+        <path d="M 124 175 Q 134 163 144 175" stroke="#382823" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <path d="M 194 175 Q 204 163 214 175" stroke="#382823" stroke-width="6" stroke-linecap="round" fill="none"/>
+      `;
+
+      // Big delighted smile
+      bunnyMouth.innerHTML = `
+        <path d="M 152 178 Q 169 170 186 178 C 188 212, 150 212, 152 178 Z" 
+              fill="#ff4d6d" stroke="#382823" stroke-width="6" stroke-linejoin="round"/>
+      `;
+
+      // Floating celebratory emojis over bunny head
+      headHearts.innerHTML = `
+        <span class="text-rose-500 text-3xl animate-bounce">💖</span>
+        <span class="text-pink-500 text-4xl animate-pulse">🥰</span>
+        <span class="text-rose-500 text-3xl animate-bounce">🍿</span>
+      `;
+
+      // Hide question text and button playground
+      questionText.classList.add('hidden');
+      subHint.classList.add('hidden');
+      buttonArea.classList.add('hidden');
+      if (btnNo) btnNo.style.display = 'none';
+
+      // Show and animate success confirmation card
+      successCard.classList.remove('hidden');
+      setTimeout(() => {
+        successCard.classList.remove('opacity-0', 'translate-y-6');
+      }, 50);
+    }
+
+    btnYes.addEventListener('click', onAccepted);
+
+    // --- Reset to initial state ---
+    btnReplay.addEventListener('click', () => {
+      successCard.classList.add('opacity-0', 'translate-y-6');
+
+      setTimeout(() => {
+        successCard.classList.add('hidden');
+        questionText.classList.remove('hidden');
+        subHint.classList.remove('hidden');
+        buttonArea.classList.remove('hidden');
+
+        // Reset Bunny
+        bunnySvgWrapper.classList.remove('bunny-happy');
+        bunnySvgWrapper.classList.add('bunny-idle');
+        bunnyEyes.innerHTML = `
+          <circle cx="132" cy="172" r="7" fill="#382823" />
+          <circle cx="204" cy="172" r="7" fill="#382823" />
+        `;
+        bunnyMouth.innerHTML = `
+          <path d="M 154 180 Q 169 174 184 180 C 184 206, 154 206, 154 180 Z" 
+                fill="#ffffff" stroke="#382823" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+        `;
+        headHearts.innerHTML = `
+          <span class="text-rose-400 text-2xl">✨</span>
+          <span class="text-pink-500 text-3xl">🌸</span>
+          <span class="text-rose-400 text-2xl">✨</span>
+        `;
+
+        // Reset Buttons
+        dodgeCount = 0;
+        yesScale = 1;
+        isSeparated = false;
+
+        initialBtnGroup.className = 'flex items-center justify-center gap-6 w-full';
+        btnYes.style.position = '';
+        btnYes.style.left = '';
+        btnYes.style.top = '';
+        btnYes.style.transform = '';
+        btnYes.style.zIndex = '';
+        btnYes.classList.remove('heart-pulse');
+
+        btnNo.style.display = '';
+        btnNo.style.position = '';
+        btnNo.style.left = '';
+        btnNo.style.top = '';
+        btnNo.style.zIndex = '';
+        btnNo.textContent = 'Kó';
+
+        subHint.textContent = "(Em chỉ được chọn 1 trong 2 thui nhen! 🎬🍿)";
+        subHint.classList.remove('text-rose-600', 'animate-pulse');
+        subHint.classList.add('text-pink-600/80');
+      }, 300);
+    });
+  </script>
+</body>
+</html>
